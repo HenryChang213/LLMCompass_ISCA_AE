@@ -1,17 +1,54 @@
-# Test scripts
+# User Guide
 
-## Matmul
+## Set up the environment
 
 ```
-python -m test.test_matmul.test_matmul --simgpu
+$ conda create -n llmcompass_ae python=3.9
+$ conda activate llmcompass_ae
+$ pip3 install scale-sim
+$ conda install pytorch==2.0.0 -c pytorch
+$ pip3 install matplotlib
+$ pip3 install seaborn
+$ pip3 install scipy
 ```
 
-## Allreduce
+## Installation
+
 ```
-python -m test.test_allreduce.plot_allreduce_gpu
+git clone https://github.com/HenryChang213/LLMCompass_ISCA_AE.git
 ```
 
-Bandwidth can be modified at `hardware_model/interconnect.py`
+## Experiment workflow
+```
+# Figure 5 (around 100 min) 
+$ cd LLMCompass/ae/figure5
+$ bash run_figure5.sh 
 
-# Scale-sim
-For scale-sim to work, try to first install numpy 1.19.0 before installing scale-sim. Scale-sim will raise some `np.int` error with numpy>=1.20 as in this issue https://github.com/scalesim-project/scale-sim-v2/issues/66.
+# Figure 6 (around 1 min)
+$ cd LLMCompass/ae/figure6
+$ bash run_figure6.sh
+
+# Figure 7 (around 20 min)
+$ cd LLMCompass/ae/figure7
+$ bash run_figure7.sh
+
+# Figure 8 (around 40 min)
+$ cd LLMCompass/ae/figure8
+$ bash run_figure8.sh
+
+# Figure 9 (around 30 min)
+$ cd LLMCompass/ae/figure9
+$ bash run_figure9.sh
+
+# Figure 10 (around 45 min)
+$ cd LLMCompass/ae/figure10
+$ bash run_figure10.sh
+
+# Figure 11 (around 5 min) 
+$ cd LLMCompass/ae/figure11
+$ bash run_figure11.sh
+
+# Figure 12 (around 4 hours) 
+$ cd LLMCompass/ae/figure12
+$ bash run_figure12.sh
+```
