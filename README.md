@@ -1,4 +1,6 @@
-# User Guide
+[![DOI](https://zenodo.org/badge/779008229.svg)](https://zenodo.org/doi/10.5281/zenodo.10892431)
+
+# LLMCompass
 
 ## Set up the environment
 
