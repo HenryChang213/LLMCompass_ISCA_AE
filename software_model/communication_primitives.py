@@ -16,7 +16,6 @@ class CommunicationPrimitive:
         self.data_type = data_type
         # simulation results
         self.latency = None
-        self.energy = None
 
 
 class AllReduceMultiPCB(CommunicationPrimitive):

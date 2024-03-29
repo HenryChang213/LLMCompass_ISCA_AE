@@ -12,7 +12,6 @@ import pandas as pd
 import os
 from scalesim.scale_sim import scalesim
 import copy
-from energy_model.energy_model import EnergyReport
 
 
 class BatchedMatmul(Operator):
@@ -128,7 +127,6 @@ class Matmul(Operator):
         self.output_shape = None
         self.look_up_table = None
         self.best_mapping = None
-        self.energy_report = EnergyReport()
 
     def __call__(self, input1: Tensor, input2: Tensor) -> Tensor:
         # [bs, M, K] * [K, N] = [bs, M, N]
@@ -747,7 +745,6 @@ class Matmul(Operator):
         mapping: Mapping,
         pcb_module: Device,
     ) -> int:
-        self.energy_report.reset()
         if self.look_up_table is None:
             self.look_up_table = pd.read_csv(
                 f"./systolic_array_model/look_up_table_{pcb_module.compute_module.core.systolic_array.array_height}_{pcb_module.compute_module.core.systolic_array.array_width}.csv",
@@ -900,15 +897,7 @@ class Matmul(Operator):
         total_cycle_count += (
             l2_tiles[0, 0, 0].M_K_io_cycle_count + l2_tiles[0, 0, 0].K_N_io_cycle_count
         )
-        if pcb_module.io_module.bandwidth != float("inf"):
-            self.energy_report.mem_count += ceil(
-                (
-                    l2_tiles[0, 0, 0].M_K_io_cycle_count
-                    + l2_tiles[0, 0, 0].K_N_io_cycle_count
-                )
-                / pcb_module.compute_module.clock_freq
-                * pcb_module.io_module.bandwidth
-            )
+
         previous_m = 0
         previous_n = 0
         previous_k = 0
@@ -942,7 +931,6 @@ class Matmul(Operator):
                 previous_tile_compute_cycle_count += (
                     previous_l2_tile.K_reduction_cycle_count
                 )
-                self.energy_report.mem_count += previous_l2_tile.K_reduction_io_count
             # previous tile write latency
             if m == previous_m and n == previous_n:
                 previous_tile_write_cycle_count = 0
@@ -968,26 +956,15 @@ class Matmul(Operator):
             previous_n = n
             previous_k = k
 
-            self.energy_report.mem_count += ceil(
-                (current_tile_read_cycle_count + previous_tile_write_cycle_count)
-                / pcb_module.compute_module.clock_freq
-                * pcb_module.io_module.bandwidth
-            )
-
         # compute and write last tile
         total_cycle_count += (
             l2_tiles[-1, -1, -1].M_N_io_cycle_count
             + l2_tiles[-1, -1, -1].compute_cycle_count
         )
-        if pcb_module.io_module.bandwidth != float("inf"):
-            self.energy_report.mem_count += ceil(
-                l2_tiles[-1, -1, -1].M_N_io_cycle_count
-                / pcb_module.compute_module.clock_freq
-                * pcb_module.io_module.bandwidth
-            )
+
         if previous_k > 0:
             total_cycle_count += ceil(l2_tiles[-1, -1, -1].K_reduction_cycle_count)
-            self.energy_report.mem_count += l2_tiles[-1, -1, -1].K_reduction_io_count
+
         return total_cycle_count #+ ceil(
         # pcb_module.io_module.latency * 2 * pcb_module.compute_module.clock_freq
         # )
@@ -1007,7 +984,6 @@ class Matmul(Operator):
             self.M = M
             self.N = N
             self.K = K
-            self.energy_report = EnergyReport()
             self.K_reduction_cycle_count = ceil(
                 M * N / pcb_module.compute_module.total_vector_flops_per_cycle
             ) + 2 * ceil(
@@ -1297,10 +1273,6 @@ class Matmul(Operator):
                     + prvious_batch_write_cycle_count
                 )
 
-                self.energy_report.l2_count += (
-                    current_batch_read_count + previous_batch_M_N_write_count
-                )
-
                 previous_batch_compute_cycle_count = current_batch_compute_cycle_count
                 previous_batch_Read_M_K = copy.deepcopy(current_batch_Read_M_K)
                 previous_batch_Read_K_N = copy.deepcopy(current_batch_Read_K_N)
@@ -1314,9 +1286,6 @@ class Matmul(Operator):
                 np.sum(previous_batch_Write_M_N * M_N_tile_size)
                 * data_type.word_size
                 / chiplet_module.compute_module.l2_bandwidth_per_cycle
-            )
-            self.energy_report.l2_count += (
-                np.sum(previous_batch_Write_M_N * M_N_tile_size) * data_type.word_size
             )
 
             return total_cycle_count
@@ -1336,7 +1305,6 @@ class Matmul(Operator):
             self.M = M
             self.N = N
             self.K = K
-            self.energy_report = EnergyReport()
             self.compute_cycle_count = self.simulate_l1_tile_compute_cycle_count(
                 M, N, K, data_type, mapping, chiplet_module, look_up_table
             )
@@ -1382,21 +1350,6 @@ class Matmul(Operator):
                 * N
                 / chiplet_module.compute_module.core.vector_unit.total_vector_flops_per_cycle
             )
-
-            # energy counter
-            M_l0 = ceil(M / M_tiling_factor)
-            N_l0 = ceil(N / N_tiling_factor)
-            K_l0 = ceil(K / K_tiling_factor)
-            self.energy_report.l1_count = (
-                M_tiling_factor
-                * N_tiling_factor
-                * K_tiling_factor
-                * (M_l0 * N_l0 + K_l0 * N_l0 + M_l0 * K_l0)
-                * data_type.word_size
-                + (K_tiling_factor - 1) * M * N * data_type.word_size
-            )
-            self.energy_report.systolic_array_mac_count = M * N * K
-            self.energy_report.vector_add_count = (K_tiling_factor - 1) * M * N
 
             return compute_cycle_count
 

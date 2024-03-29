@@ -2,7 +2,6 @@ from utils import size, closest_factors
 from typing import List, Tuple, Union
 from hardware_model.device import Device
 from software_model.utils import Tensor, DataType
-from energy_model.energy_model import EnergyReport
 
 
 class Operator:
@@ -29,12 +28,9 @@ class Operator:
         # simulation results
         self.latency = 0
         self.latency_on_gpu = 1
-        self.energy = None
         self.is_io_bound = None
         # run on gpu
         self.iterations = 50
-        # energy report
-        self.energy_report = EnergyReport()
 
     class mapping:
         pass
