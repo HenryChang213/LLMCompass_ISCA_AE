@@ -5,5 +5,5 @@ cd ../..
 
 python -m ae.figure11.test_decoding
 
-# cd ae/figure10_11
-# python plot_latency.py
+cd ae/figure11
+python plot_decoding.py

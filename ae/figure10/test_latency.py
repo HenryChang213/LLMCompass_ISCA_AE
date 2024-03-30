@@ -23,7 +23,7 @@ print(f"Our compute area: {our_compute_area_mm2} mm2")
 print(f"Our IO area: {our_io_area_mm2} mm2")
 print(f"Our total area: {our_compute_area_mm2+our_io_area_mm2} mm2")
 
-with open("ae/figure10_11/area.csv", "w") as f:
+with open("ae/figure10/area.csv", "w") as f:
     f.write(f"A100 compute area: {A100_compute_area_mm2} mm2\n")
     f.write(f"A100 IO area: {A100_io_area_mm2} mm2\n")
     f.write(f"A100 total area: {A100_compute_area_mm2+A100_io_area_mm2} mm2\n")
@@ -47,7 +47,7 @@ def simulate_decoding_latency(system, bs, seq_len, name, lock):
         system, "heuristic-GPU"
     )
     with lock:
-        with open(f"ae/figure10_11/{name}_decoding.csv", "a") as f:
+        with open(f"ae/figure10/{name}_decoding.csv", "a") as f:
             f.write(f"{bs}, {seq_len}, {auto_regression_latency_simulated}\n")
 
 
@@ -63,7 +63,7 @@ def simulate_prefill_latency(system, bs, seq_len, name, lock):
     )
     latency_simulated = model.compile_and_simulate(system, "heuristic-GPU")
     with lock:
-        with open(f"ae/figure10_11//{name}_prefill.csv", "a") as f:
+        with open(f"ae/figure10/{name}_prefill.csv", "a") as f:
             f.write(f"{bs}, {seq_len}, {latency_simulated}\n")
 
 
