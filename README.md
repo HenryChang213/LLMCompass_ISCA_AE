@@ -2,6 +2,13 @@
 
 # LLMCompass
 
+This repository provides the implementation of **LLMCompass** from the following papers:
+
+**LLMCompass: Enabling Efficient Hardware Design for Large Language Model Inference**
+
+*Hengrui Zhang, August Ning, Rohan Prabhakar, David Wentzlaff*
+
+
 ## Set up the environment
 
 ```
@@ -16,9 +23,17 @@ $ pip3 install scipy
 
 ## Installation
 
+### If using Github
 ```
-git clone https://github.com/HenryChang213/LLMCompass_ISCA_AE.git
+$ git clone https://github.com/HenryChang213/LLMCompass_ISCA_AE.git
+$ cd LLMCompass_ISCA_AE
+$ git submodule init
+$ git submodule update --recursive
 ```
+
+### If using Zenodo
+Unzip the file and download from https://github.com/PrincetonUniversity/ttm-cas.git as `cost_model\supply_chain`
+
 
 ## Experiment workflow
 ```
@@ -54,3 +69,10 @@ $ bash run_figure11.sh
 $ cd ae/figure12
 $ bash run_figure12.sh
 ```
+
+## Expected result
+
+After running each script above, the corresponding figures
+will be generated under the corresponding directory as suggested by its name.
+
+For comparison, a copy of the expected results can be found in `ae\expected_results`
