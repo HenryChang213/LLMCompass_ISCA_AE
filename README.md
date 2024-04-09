@@ -35,6 +35,11 @@ $ git submodule update --recursive
 Unzip the file and download from https://github.com/PrincetonUniversity/ttm-cas.git as `cost_model\supply_chain`
 
 
+### If using Docker
+A Dockerfile has been provided (`./Dockerfile`), including all the software dependencies and the LLMCompass source code.
+
+A docker image has been provided [here](https://github.com/HenryChang213/LLMCompass_ISCA_AE_docker).
+
 ## Experiment workflow
 ```
 # Figure 5 (around 100 min) 
